@@ -1,0 +1,32 @@
+{
+  "baseUrl": "https://api.ha*********me.io/clicker/",
+  "referer": "https://h********ame.io",
+  "tgId": 100500,
+  "botToken": "",
+  "players": [
+    {
+      "name": "Player1",
+      "maxTaps": 5000,
+      "token": "",
+      "priceForGrand": 600000,
+      "sendToTg": true,
+      "buyUpgradesAutomatically": true
+    },
+    {
+      "name": "Player2",
+      "maxTaps": 5000,
+      "token": "",
+      "priceForGrand": 2100000,
+      "sendToTg": true,
+      "buyUpgradesAutomatically": true
+    },
+    {
+      "name": "Player3",
+      "maxTaps": 8000,
+      "token": "",
+      "priceForGrand": 2100000,
+      "sendToTg": true,
+      "buyUpgradesAutomatically": true
+    }
+  ]
+}

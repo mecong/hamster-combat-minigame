@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rectangle Puzzle Game</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+  <style>
+    #game-board {
+      width: 300px;
+      height: 300px;
+      background-color: #333;
+      position: relative;
+
+    }
+
+    .rectangle {
+      position: absolute;
+      border: 1px solid #000;
+      box-sizing: border-box;
+    }
+
+    .horizontal {
+      background-color: #0f0;
+      height: 50px;
+    }
+
+    .vertical {
+      background-color: #f00;
+      width: 50px;
+    }
+
+    #key {
+      background-color: #ff0;
+    }
+
+    body {
+      display: flex; /* Use flexbox to center items */
+      justify-content: center; /* Center items horizontally */
+      align-items: center; /* Center items vertically */
+      height: 100vh; /* Full viewport height */
+      margin: 0; /* Remove default body margin */
+    }
+
+    #container {
+      display: flex; /* Use flexbox for container */
+      flex-direction: column; /* Arrange items in a column */
+      align-items: center; /* Center items horizontally */
+    }
+
+    #message {
+      font-size: 24px; /* Example font size */
+      display: none;
+    }
+
+    #reset {
+      margin-top: 10px;
+    }
+
+  </style>
+</head>
+<body>
+
+<div id="container">
+  <h1 id="message">Congratulations! You won!</h1>
+  <div id="time">00:00:00</div>
+  <div id="game-board"></div>
+  <button id="reset">Reset</button>
+</div>
+
+<script>
+
+  const horizontal = 'horizontal';
+  const vertical = 'vertical';
+  let stopwatch;
+  let elapsed = 0;
+  let started = false;
+
+  let $message = $("#message");
+
+  $(document).ready(function () {
+    const board = $('#game-board');
+    const cellSize = 50;
+
+
+    let rectangles = [];
+
+    function addKey(x, y, width, height) {
+      const type = height === 1 ? horizontal : vertical;
+
+      const rect = {id: 'key', x: x, y: y, width: width, height: height, type: type};
+      rectangles.push(rect)
+      createRect(rect)
+    }
+
+    function addHorizontal(x, y, width) {
+      const rect = {id: `h${x}${y}`, x: x, y: y, width: width, height: 1, type: horizontal};
+      rectangles.push(rect)
+      createRect(rect)
+    }
+
+    function addVertical(x, y, height) {
+      const rect = {id: `v${x}${y}`, x: x, y: y, width: 1, height: height, type: vertical};
+      rectangles.push(rect)
+      createRect(rect)
+    }
+
+
+    function createRect(rect) {
+      const rectAxis = rect.type === vertical ? 'y' : 'x';
+
+      const $rect = $('<div>')
+          .attr('id', rect.id)
+          .addClass('rectangle')
+          .addClass(rect.type)
+          .html(rect.id)
+          .css({
+            position: 'absolute',
+            left: rect.x * cellSize,
+            top: rect.y * cellSize,
+            width: rect.width * cellSize,
+            height: rect.height * cellSize
+          })
+
+          .draggable({
+            containment: board,
+            grid: [cellSize, cellSize],
+            axis: rectAxis,
+            // snap: true,
+
+            drag: function (event, ui) {
+              if (!started) {
+                startTimer()
+              }
+              const oldX = rect.x;
+              const oldY = rect.y;
+              rect.x = Math.round(ui.position.left / cellSize);
+              rect.y = Math.round(ui.position.top / cellSize);
+
+              for (const otherRect of rectangles) {
+                if (rect.id !== otherRect.id && checkCollision(otherRect, rect)) {
+                  rect.x = oldX;
+                  rect.y = oldY;
+                  return false;
+                }
+              }
+
+              if (rect.id === 'key') {
+                checkWin(rect)
+              }
+
+            }
+          });
+      board.append($rect);
+    }
+
+
+    function getOccupiedSquares(rect) {
+      const squares = new Set();
+      for (let x = rect.x; x < rect.x + rect.width; x++) {
+        for (let y = rect.y; y < rect.y + rect.height; y++) {
+          squares.add(`${x},${y}`);
+        }
+      }
+      return squares;
+    }
+
+    function checkCollision(rect1, rect2) {
+      const squares1 = getOccupiedSquares(rect1);
+      const squares2 = getOccupiedSquares(rect2);
+      for (let square of squares1) {
+        if (squares2.has(square)) {
+          console.log('Collision->>\n'
+              + 'squares1: ' + JSON.stringify([...squares1]) + '-' + rect1.id
+              + '\nsquares2: ' + JSON.stringify([...squares2]) + '-' + rect2.id)
+          return true; // Collision detected
+        }
+      }
+      return false; // No collision
+    }
+
+    function checkWin(keyRect) {
+      const squares1 = getOccupiedSquares(keyRect);
+      const squares2 = getOccupiedSquares(exit);
+
+      console.log('Check win->>\n'
+          + 'key: ' + JSON.stringify([...squares1]) + '-' + keyRect.id
+          + '\nexit: ' + JSON.stringify([...squares2]) + '-' + exit.id)
+
+
+      for (let square of squares1) {
+        if (squares2.has(square)) {
+          $message.show()
+          stopTimer()
+          return true
+
+        }
+      }
+
+      $message.hide()
+
+      return false
+    }
+
+    // Format the elapsed time as HH:MM:SS
+    function formatTime(milliseconds) {
+      const hours = Math.floor(milliseconds / 3600000);
+      const minutes = Math.floor((milliseconds % 3600000) / 60000);
+      const seconds = Math.floor((milliseconds % 60000) / 1000);
+      return (
+          ('0' + hours).slice(-2) + ':' +
+          ('0' + minutes).slice(-2) + ':' +
+          ('0' + seconds).slice(-2)
+      );
+    }
+
+    // Update the stopwatch UI with the current elapsed time
+    function updateTimer() {
+      $('#time').text(formatTime(elapsed));
+    }
+
+    // Start the stopwatch
+    function startTimer() {
+      started = true;
+      stopwatch = setInterval(function () {
+        elapsed += 1000; // Increment elapsed time by 1 second
+        updateTimer();
+      }, 1000);
+    }
+
+    // Stop the stopwatch
+    function stopTimer() {
+      started = false;
+      clearInterval(stopwatch);
+    }
+
+    // Reset the stopwatch
+    function resetTimer() {
+      started = false;
+      clearInterval(stopwatch);
+      elapsed = 0;
+      updateTimer();
+    }
+
+    $('#reset').click(function () {
+      stopTimer();
+      resetTimer()
+      rectangles = []
+      board.empty()
+      createBoard(boardString)
+      $message.hide()
+    });
+
+
+    function createBoard(input) {
+      const isLetter = (char) => /[a-zA-Z0-9]/.test(char);
+
+      let board = []
+      let rows = input.split('.')
+      let checkedCoordinates = new Set();
+
+      for (let i = 0; i < rows.length; i++) {
+        board.push(rows[i].split(' '))
+      }
+
+      for (let y = 0; y < board.length; y++) {
+        const row = board[y];
+        // console.log(row)
+        for (let x = 0; x < row.length; x++) {
+          if (checkedCoordinates.has(`${x},${y}`)) {
+            continue;
+          }
+          const elem = row[x]
+          // console.log(elem)
+          if (isLetter(elem)) {
+            //search in the row
+            let k = x + 1
+            for (; k < row.length; k++) {
+              if (row[k] !== elem) {
+                break;
+              } else {
+                checkedCoordinates.add(`${k},${y}`)
+              }
+            }
+            if (k - x > 1) {
+              // console.log(`${x},${y}`)
+              if (elem === '0') {
+                addKey(x, y, k - x, 1)
+              } else {
+                addHorizontal(x, y, k - x)
+              }
+              checkedCoordinates.add(`${x},${y}`)
+              continue;
+            }
+
+            // search in the column
+            let k1 = y + 1
+            for (; k1 < board.length; k1++) {
+              // console.log('column for letter ' + elem + ': k1=' + k1 + ' x=' + x + ' y=' + y + " board elem=" + board[k1][x])
+              if (board[k1][x] !== elem) {
+                break;
+              } else {
+                checkedCoordinates.add(`${x},${k1}`)
+              }
+            }
+            if (k1 - y > 1) {
+              // console.log(`${x},${y}, k1: ${k1}`)
+              if (elem === '0') {
+                addKey(x, y, 1, k1 - y)
+              } else {
+                addVertical(x, y, k1 - y)
+              }
+              checkedCoordinates.add(`${x},${y}`)
+            }
+
+
+          }
+        }
+      }
+    }
+
+    // const boardString='- a b b c c.- a d d d f.- a 0 0 e f.z s s - e f.z - - h g g.- v v h - -'
+    // const boardString='c c - - d -.a b - - d -.a b 0 0 d e.h b g f f e.h - g z v v.h x x z - -'
+    const boardString='a - b b - -.a - c - d -.0 0 c e d -.h h h e d f.- x g g g f.- x - - - -'
+
+
+    createBoard(boardString)
+    const exit = {id: 'exit', x: 5, y: 2, width: 1, height: 1, type: 'exit'}
+
+  });
+</script>
+</body>
+</html>
