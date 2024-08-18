@@ -13,7 +13,6 @@
       height: 300px;
       background-color: #333;
       position: relative;
-
     }
 
     .rectangle {
@@ -321,12 +320,26 @@
       }
     }
 
-    // const boardString='- a b b c c.- a d d d f.- a 0 0 e f.z s s - e f.z - - h g g.- v v h - -'
-    // const boardString='c c - - d -.a b - - d -.a b 0 0 d e.h b g f f e.h - g z v v.h x x z - -'
-    const boardString='a - b b - -.a - c - d -.0 0 c e d -.h h h e d f.- x g g g f.- x - - - -'
+    const boardString = [
+      '- a b b c c.- a d d d f.- a 0 0 e f.z s s - e f.z - - h g g.- v v h - -',
+      'c c - - d -.a b - - d -.a b 0 0 d e.h b g f f e.h - g z v v.h x x z - -',
+      'a - b b - -.a - c - d -.0 0 c e d -.h h h e d f.- x g g g f.- x - - - -',
+      '- a b b b -.- a c d e e.0 0 c d - f.- h g g g f.- h z - s s.x x z - - -',
+      '- - - - d d.- a a b c -.x 0 0 b c e.x h h h c e.x - v f f e.z z v - g g',
+      '- a - c c -.- a b b e f.- 0 0 d e f.z s s d e -.z - x g g h.z - x - - h',
+      '- - c c c d.a a b - e d.0 0 b - e f.x h g g e f.x h - z - f.- h - z s s',
+      'a - - d d -.a c c - e f.b - 0 0 e f.b g g - e -.- - h z z s.x x h - - s',
+      '- c c d e e.a b - d f -.a b 0 0 f -.a h h - f -.- - x g g g.- - x - - -',
+      '- - a a a -.- - - b c c.- 0 0 b d e.- g f f d e.h g - v s s.h x x v - -',
+      '- a a b b b.- - c d e e.0 0 c d - f.- h g g g f.- h x - v v.z z x - - -',
+      '- a a a - d.- - b c c d.0 0 b e f -.h h h e f -.x g g g f z.x - - v v z',
+      '- a - b c c.- a - b d -.- a 0 0 d -.x x h - d -.- - h e e f.g g g - - f',
+      '- b b c d d.- a - c e -.- a 0 0 e f.s h h g g f.s - x v v v.- - x - - -',
+      'a - c c - -.a - b d d d.0 0 b e - f.x h h e - f.x z g g g f.- z - - v v'
+    ]
 
 
-    createBoard(boardString)
+    createBoard(boardString[boardString.length - 1])
     const exit = {id: 'exit', x: 5, y: 2, width: 1, height: 1, type: 'exit'}
 
   });

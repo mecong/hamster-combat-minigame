@@ -81,6 +81,7 @@ public class MultiClickerTask {
     String token;
     double priceForGrand;
     boolean sendToTg;
+    int tapProbabilityPercent = 50;
     boolean buyUpgradesAutomatically;
 
     public void startSyncTimer() {
@@ -206,6 +207,13 @@ public class MultiClickerTask {
     }
 
     private void sendTapRequest(long tapAmount) throws IOException {
+      int randomizer = random.nextInt(100) + 1;
+
+      if (randomizer > this.getTapProbabilityPercent()) {
+        log.info("Taps for {} skipped", this.name);
+        return;
+      }
+
       HttpURLConnection conn = getHttpURLConnection("tap");
 
       conn.setDoOutput(true);
