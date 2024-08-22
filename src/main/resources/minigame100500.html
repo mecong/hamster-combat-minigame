@@ -248,7 +248,7 @@
       resetTimer()
       rectangles = []
       board.empty()
-      createBoard(boardString)
+      createBoard(getBoardString())
       $message.hide()
     });
 
@@ -320,6 +320,10 @@
       }
     }
 
+    function getBoardString(){
+      return boardString[boardString.length - 1];
+    }
+
     const boardString = [
       '- a b b c c.- a d d d f.- a 0 0 e f.z s s - e f.z - - h g g.- v v h - -',
       'c c - - d -.a b - - d -.a b 0 0 d e.h b g f f e.h - g z v v.h x x z - -',
@@ -335,11 +339,15 @@
       '- a a a - d.- - b c c d.0 0 b e f -.h h h e f -.x g g g f z.x - - v v z',
       '- a - b c c.- a - b d -.- a 0 0 d -.x x h - d -.- - h e e f.g g g - - f',
       '- b b c d d.- a - c e -.- a 0 0 e f.s h h g g f.s - x v v v.- - x - - -',
-      'a - c c - -.a - b d d d.0 0 b e - f.x h h e - f.x z g g g f.- z - - v v'
+      'a - c c - -.a - b d d d.0 0 b e - f.x h h e - f.x z g g g f.- z - - v v',
+      'a a b c c -.- - b d - e.s 0 0 d - e.s x - d f f.s x h h g -.v v v - g -',
+      '- a b b c c.- a d - e f.0 0 d - e f.z x x g e -.z - - g h h.s s s g - -',
+      '- b - - e e.a b c c d -.a b 0 0 d f.h h g - d f.- - g v v s.x x x - - s',
+      'b b - c - -.- a - c d d.- a 0 0 e f.s x x h e f.s - - h g g.s z z z - -',
     ]
 
 
-    createBoard(boardString[boardString.length - 1])
+    createBoard(getBoardString())
     const exit = {id: 'exit', x: 5, y: 2, width: 1, height: 1, type: 'exit'}
 
   });

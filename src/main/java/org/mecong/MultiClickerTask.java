@@ -52,7 +52,7 @@ public class MultiClickerTask {
 
     config.getPlayers().forEach(requestConfig -> {
       requestConfig.startSyncTimer();
-      requestConfig.startTapTimer();
+      requestConfig.scheduleTapTimer();
     });
   }
 
@@ -97,7 +97,7 @@ public class MultiClickerTask {
       }, 0, Duration.ofHours(1).toMillis());
     }
 
-    public void startTapTimer() {
+    public void scheduleTapTimer() {
       int intervalMinutes = (int) (Math.floor(maxTaps / 3.0 / 60));
       int randomTime = intervalMinutes - random.nextInt(10);
 
@@ -107,10 +107,10 @@ public class MultiClickerTask {
         @Override
         public void run() {
           try {
+            scheduleTapTimer();
+
             sendTapRequest(duration.toSeconds() * 3);
             sendUpgradesToBuyRequest();
-
-            startTapTimer();
 
           } catch (IOException e) {
             log.error(e.getMessage(), e);
